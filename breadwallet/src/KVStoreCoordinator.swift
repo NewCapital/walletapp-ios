@@ -31,7 +31,7 @@ class KVStoreCoordinator: Subscriber {
             try? kvStore.syncKey(tokenListMetaDataKey, completionHandler: {_ in })
         }
 
-        assert(Store.state.availableTokens.count > 1, "missing token list")
+       // assert(Store.state.availableTokens.count > 1, "missing token list")
         if currencyMetaData.enabledCurrencies.isEmpty {
             print("no wallets enabled in metadata, reverting to default")
             currencyMetaData.enabledCurrencies = CurrencyListMetaData.defaultCurrencies
@@ -130,6 +130,8 @@ class KVStoreCoordinator: Subscriber {
         guard !hasRetreivedInitialWalletInfo else { return }
         if let walletInfo = WalletInfo(kvStore: kvStore) {
             Store.perform(action: WalletChange(Currencies.btc).setWalletName(walletInfo.name))
+            Store.perform(action: WalletChange(Currencies.twins).setWalletName(walletInfo.name))
+
             Store.perform(action: WalletChange(Currencies.btc).setWalletCreationDate(walletInfo.creationDate))
         } else {
             print("no wallet info found")

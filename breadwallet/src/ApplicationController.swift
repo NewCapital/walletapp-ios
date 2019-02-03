@@ -91,7 +91,12 @@ class ApplicationController: Subscriber, Trackable {
     private func initWalletsWithMigration(completion: @escaping () -> Void) {
         let btc = Currencies.btc
         let bch = Currencies.bch
-
+        guard let twinsWalletManager = try? BTCWalletManager(currency: Currencies.twins, dbPath: Currencies.twins.dbPath) else { return }
+        twinsWalletManager.initWallet { [unowned self] success in
+            guard success else {
+                completion()
+                return
+            }}
         guard let btcWalletManager = try? BTCWalletManager(currency: btc, dbPath: btc.dbPath) else { return }
         walletManagers[btc.code] = btcWalletManager
         btcWalletManager.initWallet { [unowned self] success in
@@ -99,7 +104,7 @@ class ApplicationController: Subscriber, Trackable {
                 completion()
                 return
             }
-
+          
             btcWalletManager.initPeerManager {
                 btcWalletManager.db?.loadTransactions { txns in
                     btcWalletManager.db?.loadBlocks { blocks in
@@ -123,6 +128,7 @@ class ApplicationController: Subscriber, Trackable {
                         }
                         // init other wallets
                         self.initWallets(completion: completion)
+                
                     }
                 }
             }
@@ -285,7 +291,8 @@ class ApplicationController: Subscriber, Trackable {
         walletCoordinator = WalletCoordinator(walletManagers: walletManagers)
         Backend.connectWallet(primaryWalletManager, currencies: Store.state.currencies, walletManagers: walletManagers.map { $0.1 })
         Backend.sendLaunchEvent()
-
+        Backend.connectWallet(secondaryWalletManager!, currencies: Store.state.currencies, walletManagers: walletManagers.map { $0.1 })
+        Backend.sendLaunchEvent()
         if let ethWalletManager = walletManagers[Currencies.eth.code] as? EthWalletManager {
             ethWalletManager.apiClient = Backend.apiClient
             if !UserDefaults.hasScannedForTokenBalances {

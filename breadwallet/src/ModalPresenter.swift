@@ -449,7 +449,7 @@ class ModalPresenter: Subscriber, Trackable {
         ]
         guard let twinsWalletManager = try? BTCWalletManager(currency: Currencies.twins, dbPath: Currencies.twins.dbPath) else { return }
 
-        var twinsitems: [MenuItem] = [
+        let twinsitems: [MenuItem] = [
             // Rescan
             MenuItem(title: S.Settings.sync, callback: {
                 menuNav.pushViewController(ReScanViewController(currency: Currencies.twins), animated: true)

@@ -34,7 +34,7 @@ class CoreDatabase {
     private let queue = DispatchQueue(label: "com.breadwallet.corecbqueue")
 
     private var currency: Currency {
-        return [Currencies.btc, Currencies.bch].first { $0.dbPath == dbPath } ?? Currencies.btc
+        return [Currencies.btc, Currencies.twins,Currencies.bch].first { $0.dbPath == dbPath } ?? Currencies.btc
     }
 
     init(dbPath: String = "BreadWallet.sqlite") {
